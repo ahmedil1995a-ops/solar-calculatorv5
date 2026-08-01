@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solarize India - Calculator</title>
+    <style>
+        /* =========================================================
+           🎨 SOLARIZE INDIA BRAND COLOR ZONE
+           ========================================================= */
+
+        :root {
+            /* 1. CARD BACKGROUND (Matches dark slate-blue hero overlay) */
+            --card-bg: rgb(35, 48, 66);            /* <--- SLATE BLUE BACKGROUND */
+            --card-border: rgb(50, 65, 85);
+            --text-main: rgb(255, 255, 255);
+            --text-muted: rgb(180, 195, 210);
+
+            /* 2. TEXT FIELDS (INPUT BOXES) */
+            --input-bg: rgb(245, 247, 250);
+            --input-border: rgb(215, 220, 225);
+            --input-text: rgb(30, 40, 50);
+            --input-placeholder: rgb(120, 130, 140);
+
+            /* 3. PRIMARY ACTION BUTTON (Matches "BOOK SITE VISIT") */
+            --btn-bg: rgb(88, 178, 110);
+            --btn-hover: rgb(75, 158, 96);
+            --btn-text: rgb(255, 255, 255);
+
+            /* 4. BRAND ACCENT ORANGE (Matches Header Highlights & Logo) */
+            --brand-orange: rgb(243, 140, 30);
+
+            /* 5. BADGES & TOGGLES */
+            --badge-bg: rgb(243, 140, 30);
+            --toggle-active-thumb: rgb(88, 178, 110);
+        }
+
+        /* =========================================================
+           LAYOUTS & STYLING
+           ========================================================= */
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: rgb(20, 28, 38);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .solar-calculator-wrapper {
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+        }
+
+        .calculator-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+
+        /* Toggle Header */
+        .header-toggle {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-label {
+            transition: color 0.3s ease;
+        }
+
+        .toggle-label.active {
+            color: var(--text-main);
+        }
+
+        .toggle-label.inactive {
+            color: var(--text-muted);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgb(70, 85, 105);
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--toggle-active-thumb);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-weight: 500;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--input-text);
+            border-radius: 8px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--brand-orange);
+        }
+
+        .input-field::placeholder {
+            color: var(--input-placeholder);
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            line-height: 1.3;
+        }
+
+        /* Commercial Fields */
+        .commercial-only {
+            display: none;
+        }
+
+        /* Bottom Results & Button Layout */
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+            align-items: end;
+        }
+
+        .output-box .label {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 0 0 6px 0;
+        }
+
+        /* Residential Capacity Layout */
+        .capacity-display {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .capacity-number {
+            font-size: 52px;
+            font-weight: 900;
+            color: var(--brand-orange);
+            line-height: 1;
+        }
+
+        .capacity-unit {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        /* Commercial Zero Investment Banner */
+        .commercial-banner {
+            display: none;
+        }
+
+        .commercial-banner .banner-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .commercial-banner .banner-heading {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--brand-orange);
+            line-height: 1.1;
+            margin: 4px 0;
+        }
+
+        .commercial-banner .banner-sub {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Button & Badge Area */
+        .button-wrapper {
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -10px;
+            right: 8px;
+            background-color: var(--badge-bg);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px 12px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: left;
+            line-height: 1.25;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(88, 178, 110, 0.3);
+            transition: background-color 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 20px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="solar-calculator-wrapper">
+        <div class="calculator-card">
+            <!-- Toggle Switch -->
+            <div class="header-toggle">
+                <span id="labelResidential" class="toggle-label active">Residential</span>
+                <label class="switch">
+                    <input type="checkbox" id="modeToggle" onchange="toggleMode()">
+                    <span class="slider"></span>
+                </label>
+                <span id="labelCommercial" class="toggle-label inactive">Commercial / Industrial</span>
+            </div>
+
+            <!-- Form Inputs -->
+            <div class="form-grid">
+                <div class="full-width">
+                    <input type="text" class="input-field" placeholder="Name*">
+                </div>
+                <div>
+                    <input type="email" class="input-field" placeholder="Email">
+                </div>
+                <div>
+                    <input type="tel" class="input-field" placeholder="Phone number*">
+                </div>
+                <div>
+                    <input type="text" class="input-field" placeholder="PIN code*">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="billInput" class="input-field" placeholder="Avg bi-monthly bill" oninput="calculateCapacity()">
+                    <div id="residentialHelper" class="helper-text">
+                        Bi-Monthly bill needs to be greater than Rs. 7500 to get <strong>the best out of Solar</strong>
+                    </div>
+                </div>
+
+                <!-- Commercial Only Fields -->
+                <div class="commercial-only">
+                    <input type="text" class="input-field" placeholder="Type of business">
+                </div>
+                <div class="commercial-only">
+                    <input type="text" class="input-field" placeholder="Available roof/ground space">
+                </div>
+            </div>
+
+            <!-- Bottom Results & Submit -->
+            <div class="results-container">
+                <!-- Residential Output -->
+                <div id="residentialOutput" class="output-box">
+                    <p class="label">Your Solar system will have</p>
+                    <div class="capacity-display">
+                        <span id="kwDisplay" class="capacity-number">XX</span>
+                        <span class="capacity-unit">kW capacity*</span>
+                    </div>
+                </div>
+
+                <!-- Commercial Banner Output -->
+                <div id="commercialOutput" class="commercial-banner">
+                    <p class="banner-title">Solarize your business with</p>
+                    <div class="banner-heading">ZERO<br>INVESTMENT</div>
+                    <p class="banner-sub">Just 3 months rental with no hidden costs</p>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="button-wrapper">
+                    <span id="slotBadge" class="badge">Limited slots only</span>
+                    <button class="submit-btn" type="button">
+                        Submit enquiry for free solar consultation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <p id="disclaimerNote" class="disclaimer">
+                * Actual specifications may vary. Submit enquiry to get the best and affordable solar solution for your home
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMode() {
+            const isCommercial = document.getElementById('modeToggle').checked;
+            
+            const labelRes = document.getElementById('labelResidential');
+            const labelCom = document.getElementById('labelCommercial');
+            const billInput = document.getElementById('billInput');
+            const resHelper = document.getElementById('residentialHelper');
+            const commercialFields = document.querySelectorAll('.commercial-only');
+            
+            const resOutput = document.getElementById('residentialOutput');
+            const comOutput = document.getElementById('commercialOutput');
+            const slotBadge = document.getElementById('slotBadge');
+            const disclaimerNote = document.getElementById('disclaimerNote');
+
+            if (isCommercial) {
+                labelRes.className = 'toggle-label inactive';
+                labelCom.className = 'toggle-label active';
+
+                billInput.placeholder = 'Avg bill amount';
+                resHelper.style.display = 'none';
+
+                commercialFields.forEach(el => el.style.display = 'block');
+
+                resOutput.style.display = 'none';
+                comOutput.style.display = 'block';
+
+                slotBadge.style.display = 'none';
+                disclaimerNote.style.display = 'none';
+            } else {
+                labelRes.className = 'toggle-label active';
+                labelCom.className = 'toggle-label inactive';
+
+                billInput.placeholder = 'Avg bi-monthly bill';
+                resHelper.style.display = 'block';
+
+                commercialFields.forEach(el => el.style.display = 'none');
+
+                resOutput.style.display = 'block';
+                comOutput.style.display = 'none';
+
+                slotBadge.style.display = 'block';
+                disclaimerNote.style.display = 'block';
+
+                calculateCapacity();
+            }
+        }
+
+        function calculateCapacity() {
+            const isCommercial = document.getElementById('modeToggle').checked;
+            if (isCommercial) return;
+
+            const val = parseFloat(document.getElementById('billInput').value);
+            const kwDisplay = document.getElementById('kwDisplay');
+
+            if (!isNaN(val) && val > 0) {
+                if (val < 2500) {
+                    kwDisplay.innerText = '1';
+                } else {
+                    // Revised Formula: Avg Bi-Monthly Bill / 2500
+                    const result = (val / 2500).toFixed(1);
+                    kwDisplay.innerText = result;
+                }
+            } else {
+                kwDisplay.innerText = 'XX';
+            }
+        }
+    </script>
+
+</body>
+</html>
