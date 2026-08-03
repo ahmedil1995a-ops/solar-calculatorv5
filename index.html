@@ -312,7 +312,7 @@
                     <input type="text" class="input-field" placeholder="PIN code*">
                 </div>
                 <div class="input-group">
-                    <input type="number" id="billInput" class="input-field" placeholder="Avg bi-monthly bill" oninput="calculateCapacity()">
+                    <input type="number" id="billInput" class="input-field" placeholder="Avg bi-monthly bill (INR)" oninput="calculateCapacity()">
                     <div id="residentialHelper" class="helper-text">
                         Bi-Monthly bill needs to be greater than Rs. 7500 to get <strong>the best out of Solar</strong>
                     </div>
@@ -380,7 +380,7 @@
                 labelRes.className = 'toggle-label inactive';
                 labelCom.className = 'toggle-label active';
 
-                billInput.placeholder = 'Avg bill amount';
+                billInput.placeholder = 'Avg bill amount (INR)';
                 resHelper.style.display = 'none';
 
                 commercialFields.forEach(el => el.style.display = 'block');
@@ -394,7 +394,7 @@
                 labelRes.className = 'toggle-label active';
                 labelCom.className = 'toggle-label inactive';
 
-                billInput.placeholder = 'Avg bi-monthly bill';
+                billInput.placeholder = 'Avg bi-monthly bill (INR)';
                 resHelper.style.display = 'block';
 
                 commercialFields.forEach(el => el.style.display = 'none');
@@ -420,7 +420,7 @@
                 if (val < 2500) {
                     kwDisplay.innerText = '1';
                 } else {
-                    // Revised Formula: Avg Bi-Monthly Bill / 2500
+                    // Revised Formula: Avg bi-monthly bill (INR) / 2500
                     const result = (val / 2500).toFixed(1);
                     kwDisplay.innerText = result;
                 }
