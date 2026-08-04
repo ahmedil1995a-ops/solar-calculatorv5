@@ -11,7 +11,7 @@
 
         :root {
             /* 1. CARD BACKGROUND (Matches dark slate-blue hero overlay) */
-            --card-bg: rgb(35, 48, 66);            /* <--- SLATE BLUE BACKGROUND */
+            --card-bg: rgb(35, 48, 66);
             --card-border: rgb(50, 65, 85);
             --text-main: rgb(255, 255, 255);
             --text-muted: rgb(180, 195, 210);
@@ -275,6 +275,11 @@
             background-color: var(--btn-hover);
         }
 
+        .submit-btn:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
         .disclaimer {
             font-size: 11px;
             color: var(--text-muted);
@@ -298,61 +303,63 @@
             </div>
 
             <!-- Form Inputs -->
-            <div class="form-grid">
-                <div class="full-width">
-                    <input type="text" class="input-field" placeholder="Name*">
-                </div>
-                <div>
-                    <input type="email" class="input-field" placeholder="Email">
-                </div>
-                <div>
-                    <input type="tel" class="input-field" placeholder="Phone number*">
-                </div>
-                <div>
-                    <input type="text" class="input-field" placeholder="PIN code*">
-                </div>
-                <div class="input-group">
-                    <input type="number" id="billInput" class="input-field" placeholder="Avg bi-monthly bill (INR)" oninput="calculateCapacity()">
-                    <div id="residentialHelper" class="helper-text">
-                        Bi-Monthly bill needs to be greater than Rs. 7500 to get <strong>the best out of Solar</strong>
+            <form id="solarForm">
+                <div class="form-grid">
+                    <div class="full-width">
+                        <input type="text" id="nameInput" class="input-field" placeholder="Name*" required>
+                    </div>
+                    <div>
+                        <input type="email" id="emailInput" class="input-field" placeholder="Email">
+                    </div>
+                    <div>
+                        <input type="tel" id="phoneInput" class="input-field" placeholder="Phone number*" required>
+                    </div>
+                    <div>
+                        <input type="text" id="pinInput" class="input-field" placeholder="PIN code*" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="billInput" class="input-field" placeholder="Avg bi-monthly bill (INR)" oninput="calculateCapacity()" required>
+                        <div id="residentialHelper" class="helper-text">
+                            Bi-Monthly bill needs to be greater than Rs. 7500 to get <strong>the best out of Solar</strong>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Only Fields -->
+                    <div class="commercial-only">
+                        <input type="text" id="businessInput" class="input-field" placeholder="Type of business">
+                    </div>
+                    <div class="commercial-only">
+                        <input type="text" id="areaInput" class="input-field" placeholder="Area (sq.ft)">
                     </div>
                 </div>
 
-                <!-- Commercial Only Fields -->
-                <div class="commercial-only">
-                    <input type="text" class="input-field" placeholder="Type of business">
-                </div>
-                <div class="commercial-only">
-                    <input type="text" class="input-field" placeholder="Area (sq.ft)">
-                </div>
-            </div>
+                <!-- Bottom Results & Submit -->
+                <div class="results-container">
+                    <!-- Residential Output -->
+                    <div id="residentialOutput" class="output-box">
+                        <p class="label">Your Solar system will have</p>
+                        <div class="capacity-display">
+                            <span id="kwDisplay" class="capacity-number">XX</span>
+                            <span class="capacity-unit">kW capacity*</span>
+                        </div>
+                    </div>
 
-            <!-- Bottom Results & Submit -->
-            <div class="results-container">
-                <!-- Residential Output -->
-                <div id="residentialOutput" class="output-box">
-                    <p class="label">Your Solar system will have</p>
-                    <div class="capacity-display">
-                        <span id="kwDisplay" class="capacity-number">XX</span>
-                        <span class="capacity-unit">kW capacity*</span>
+                    <!-- Commercial Banner Output -->
+                    <div id="commercialOutput" class="commercial-banner">
+                        <p class="banner-title">Solarize your business with</p>
+                        <div class="banner-heading">MINIMUM UPFRONT<br>COST</div>
+                        <p class="banner-sub">Just 3 months rental with no hidden costs</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="button-wrapper">
+                        <span id="slotBadge" class="badge">Limited slots only</span>
+                        <button class="submit-btn" id="submitBtn" type="button" onclick="submitForm()">
+                            Submit enquiry for free solar consultation
+                        </button>
                     </div>
                 </div>
-
-                <!-- Commercial Banner Output -->
-                <div id="commercialOutput" class="commercial-banner">
-                    <p class="banner-title">Solarize your business with</p>
-                    <div class="banner-heading">MINIMUM UPFRONT<br>COST</div>
-                    <p class="banner-sub">Just 3 months rental with no hidden costs</p>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="button-wrapper">
-                    <span id="slotBadge" class="badge">Limited slots only</span>
-                    <button class="submit-btn" type="button">
-                        Submit enquiry for free solar consultation
-                    </button>
-                </div>
-            </div>
+            </form>
 
             <!-- Disclaimer -->
             <p id="disclaimerNote" class="disclaimer">
@@ -362,6 +369,9 @@
     </div>
 
     <script>
+        // REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzcTIByTz1iSQ7R4i6TrtGhFD8TFgQfAZRnpqJ5dfZM9Zr9OFCmB9W1BvJUshXoN5HEXg/exec";
+
         function toggleMode() {
             const isCommercial = document.getElementById('modeToggle').checked;
             
@@ -420,13 +430,60 @@
                 if (val < 2500) {
                     kwDisplay.innerText = '1';
                 } else {
-                    // Revised Formula: Avg bi-monthly bill (INR) / 2500
                     const result = (val / 2500).toFixed(1);
                     kwDisplay.innerText = result;
                 }
             } else {
                 kwDisplay.innerText = 'XX';
             }
+        }
+
+        function submitForm() {
+            const form = document.getElementById('solarForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const isCommercial = document.getElementById('modeToggle').checked;
+
+            const payload = {
+                type: isCommercial ? "Commercial/ Industrial" : "Residential",
+                name: document.getElementById('nameInput').value,
+                email: document.getElementById('emailInput').value,
+                phone: document.getElementById('phoneInput').value,
+                pinCode: document.getElementById('pinInput').value,
+                bill: document.getElementById('billInput').value,
+                capacity: isCommercial ? "N/A" : document.getElementById('kwDisplay').innerText,
+                businessType: isCommercial ? document.getElementById('businessInput').value : "",
+                area: isCommercial ? document.getElementById('areaInput').value : ""
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("Thank you! Your enquiry has been submitted.");
+                form.reset();
+                document.getElementById('kwDisplay').innerText = 'XX';
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit enquiry for free solar consultation";
+            })
+            .catch(error => {
+                console.error("Error!", error.message);
+                alert("Something went wrong. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit enquiry for free solar consultation";
+            });
         }
     </script>
 
